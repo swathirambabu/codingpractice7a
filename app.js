@@ -42,10 +42,12 @@ const convertDBObjectToResponseObject = (dbObject) => {
 };
 //api1
 app.get("/players/", async (request, response) => {
-  const getAllPlayers = `select * from player_details;`;
-  const playerArray = await db.all(getAllPlayers);
+  const getPlayersQuery = `select * from player_details;`;
+  const playersArray = await db.all(getPlayersQuery);
   response.send(
-    playerArray.map((eachObject) => convertDBObjectToResponseObject(eachObject))
+    playersArray.map((eachPlayer) =>
+      convertDBObjectToResponseObject(eachPlayer)
+    )
   );
 });
 
@@ -77,20 +79,24 @@ app.get("/matches/:matchId/", async (request, response) => {
 
 app.get("/players/:playerId/matches", async (request, response) => {
   const { playerId } = request.params;
-  const getPlayerMatchDetails = `select * from player_match_score NATURAL JOIN match_details where player_id=${playerId};`;
-  const playerArray = await db.all(getPlayerMatchDetails);
+  const getPlayerMatchesQuery = `select * from player_match_score NATURAL JOIN match_details where player_id=${playerId};`;
+  const playerMatches = await db.all(getPlayerMatchesQuery);
   response.send(
-    playerArray.map((eachObject) => convertDBObjectToResponseObject(eachObject))
+    playerMatches.map((eachPlayer) =>
+      convertDBObjectToResponseObject(eachPlayer)
+    )
   );
 });
 
 //api 6
 app.get("/matches/:matchId/players", async (request, response) => {
   const { matchId } = request.params;
-  const getAllPlayerDetails = `select * from player_match_score NATURAL JOIN player_details where match_id=${matchId};`;
-  const playerArray = await db.all(getAllPlayerDetails);
+  const getMatchPlayersQuery = `select * from player_match_score NATURAL JOIN player_details where match_id=${matchId};`;
+  const playersArray = await db.all(getMatchPlayersQuery);
   response.send(
-    playerArray.map((eachObject) => convertDBObjectToResponseObject(eachObject))
+    playersArrays.map((eachPlayer) =>
+      convertDBObjectToResponseObject(eachObject)
+    )
   );
 });
 //api 7
