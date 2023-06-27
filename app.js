@@ -89,7 +89,8 @@ app.get("/players/:playerId/matches", async (request, response) => {
 //api 6
 app.get("/matches/:matchId/players", async (request, response) => {
   const { matchId } = request.params;
-  const getMatchPlayersQuery = `select * from player_match_score NATURAL JOIN player_details where match_id=${matchId};`;
+  const getMatchPlayersQuery = `select player_details.player_id AS playerId,
+	      player_details.player_name AS playerName from player_match_score NATURAL JOIN player_details where match_id=${matchId};`;
   const playersArray = await db.all(getMatchPlayersQuery);
   response.send(
     playersArrays.map((eachPlayer) =>
