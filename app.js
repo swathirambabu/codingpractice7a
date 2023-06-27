@@ -95,7 +95,7 @@ app.get("/matches/:matchId/players", async (request, response) => {
   const playersArray = await db.all(getMatchPlayersQuery);
   response.send(
     playersArrays.map((eachPlayer) =>
-      convertDBObjectToResponseObject(eachObject)
+      convertDBObjectToResponseObject(eachPlayer)
     )
   );
 });
