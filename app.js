@@ -72,3 +72,37 @@ app.get("/matches/:matchId/", async (request, response) => {
   const matchArray = await db.get(getAllMatch);
   response.send(convertDBObjectToResponseObject(matchArray));
 });
+
+//api5
+
+app.get("/players/:playerId/matches", async (request, response) => {
+  const { playerId } = request.params;
+  const getPlayerMatchDetails = `select * from player_match_score NATURAL JOIN match_details where player_id=${playerId};`;
+  const playerArray = await db.all(getPlayerMatchDetails);
+  response.send(
+    playerArray.map((eachObject) => convertDBObjectToResponseObject(eachObject))
+  );
+});
+
+//api 6
+app.get("/matches/:matchId/players", async (request, response) => {
+  const { matchId } = request.params;
+  const getAllPlayerDetails = `select * from player_match_score NATURAL JOIN player_details where match_id=${matchId};`;
+  const playerArray = await db.all(getAllPlayerDetails);
+  response.send(
+    playerArray.map((eachObject) => convertDBObjectToResponseObject(eachObject))
+  );
+});
+//api 7
+app.get("/players/:playerId/playerScores", async (request, response) => {
+  const { playerId } = request.params;
+  const getAllQuery = `select player_id as playerId,
+                                player_name as playerName,
+                                SUM(score) as totalScore,
+                                SUM(fours) as totalFours,
+                                SUM(sixes) as totalSixes 
+                                from player_match_score NATURAL JOIN player_details where player_id=${playerId};`;
+  const playerArray = await db.get(getAllQuery);
+  response.send(playerArray);
+});
+module.exports = app;
