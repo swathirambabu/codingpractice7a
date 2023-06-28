@@ -27,17 +27,17 @@ const initializeDBAndServer = async () => {
 
 initializeDBAndServer();
 
-const convertDBObjectToResponseObject = (dbObject) => {
+const convertPlayerDBObjectToResponseObject = (dbObject) => {
   return {
     playerId: dbObject.player_id,
     playerName: dbObject.player_name,
+  };
+};
+const convertMatchDetailsDBObjectToResponseObject = (dbObject) => {
+  return {
     matchId: dbObject.match_id,
     match: dbObject.match,
     year: dbObject.year,
-    playerMatchId: dbObject.player_match_id,
-    score: dbObject.score,
-    fours: dbObject.fours,
-    sixes: dbObject.sixes,
   };
 };
 //api1
@@ -46,7 +46,7 @@ app.get("/players/", async (request, response) => {
   const playersArray = await db.all(getPlayersQuery);
   response.send(
     playersArray.map((eachPlayer) =>
-      convertDBObjectToResponseObject(eachPlayer)
+      convertPlayerDBObjectToResponseObject(eachPlayer)
     )
   );
 });
@@ -56,7 +56,7 @@ app.get("/players/:playerId/", async (request, response) => {
   const { playerId } = request.params;
   const getPlayers = `select * from player_details where player_id=${playerId};`;
   const player = await db.get(getPlayers);
-  response.send(convertDBObjectToResponseObject(player));
+  response.send(convertPlayerDBObjectToResponseObject(player));
 });
 //api3
 
@@ -72,7 +72,7 @@ app.get("/matches/:matchId/", async (request, response) => {
   const { matchId } = request.params;
   const getAllMatch = `select * from match_details where match_id=${matchId};`;
   const matchArray = await db.get(getAllMatch);
-  response.send(convertDBObjectToResponseObject(matchArray));
+  response.send(convertMatcDetailsDBObjectToResponseObject(matchArray));
 });
 
 //api5
@@ -82,7 +82,9 @@ app.get("/players/:playerId/matches", async (request, response) => {
   const getPlayerMatchesQuery = `select * from player_match_score NATURAL JOIN match_details where player_id=${playerId};`;
   const playerMatches = await db.all(getPlayerMatchesQuery);
   response.send(
-    playerMatches.map((eachMatch) => convertDBObjectToResponseObject(eachMatch))
+    playerMatches.map((eachMatch) =>
+      convertMatchDetailsDBObjectToResponseObject(eachMatch)
+    )
   );
 });
 
@@ -93,8 +95,8 @@ app.get("/matches/:matchId/players", async (request, response) => {
 	      player_details.player_name AS playerName from player_match_score NATURAL JOIN player_details where match_id=${matchId};`;
   const playersArray = await db.all(getMatchPlayersQuery);
   response.send(
-    playersArrays.map((eachPlayer) =>
-      convertDBObjectToResponseObject(eachPlayer)
+    playersArray.map((eachPlayer) =>
+      convertMatchDetailsDBObjectToResponseObject(eachPlayer)
     )
   );
 });
@@ -108,6 +110,10 @@ app.get("/players/:playerId/playerScores", async (request, response) => {
                                 SUM(sixes) as totalSixes 
                                 from player_match_score NATURAL JOIN player_details where player_id=${playerId};`;
   const playerArray = await db.get(getAllQuery);
-  response.send(playerArray);
+  response.send(
+    playerArray.map((eachPlayer) =>
+      convertPlayerDBObjectToResponseObject(eachPlayer)
+    )
+  );
 });
 module.exports = app;
